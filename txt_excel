@@ -1,0 +1,110 @@
+#!/usr/bin/env python3
+import re
+from pathlib import Path
+import openpyxl
+from openpyxl.styles import Font, PatternFill, Alignment
+
+CAMPOS = [
+    ("NS",               r"^ns\s*[:\-]?\s*(.+)"),
+    ("Pwd",              r"^pwd\s*[:\-]?\s*(.+)"),
+    ("Ubicación",        r"^ubicaci[oó]n\s*[:\-]?\s*(.+)"),
+    ("Nombre área",      r"^nombre\s+[aá]rea\s*[:\-]?\s*(.+)"),
+    ("Nivel",            r"^nivel\s*[:\-]?\s*(.+)"),
+    ("Contraseña",       r"^contrase[nñ]a\s*[:\-]?\s*(.+)"),
+    ("Se remplaza NS",   r"^se\s+remplaza\s+ns\s*[:\-]?\s*(.+)"),
+    ("Marca/Modelo",     r"^marca\s+sharp\s+modelo\s*[:\-]?\s*(.+)|^modelo\s*[:\-]?\s*(.+)"),
+    ("IP",               r"^ip\s*[:\-]?\s*(.+)"),
+]
+
+
+def parsear_bloque(lineas: list[str]) -> dict:
+    registro = {col: "" for col, _ in CAMPOS}
+    for linea in lineas:
+        linea = linea.strip()
+        if not linea:
+            continue
+        for col, patron in CAMPOS:
+            m = re.match(patron, linea, re.IGNORECASE)
+            if m:
+                valor = next((g for g in m.groups() if g), "").strip()
+                registro[col] = valor
+                break
+    return registro
+
+
+def leer_bloques(ruta_txt: str) -> list[dict]:
+    texto = Path(ruta_txt).read_text(encoding="utf-8", errors="replace")
+    bloques_raw = re.split(r"\n\s*\n", texto.strip())
+    registros = []
+    for bloque in bloques_raw:
+        lineas = bloque.splitlines()
+        if not lineas:
+            continue
+        registro = parsear_bloque(lineas)
+        if any(v for v in registro.values()):
+            registros.append(registro)
+    return registros
+
+
+def escribir_excel(registros: list[dict], ruta_salida: str):
+    encabezados = [col for col, _ in CAMPOS]
+    archivo_existe = Path(ruta_salida).exists()
+
+    if archivo_existe:
+        wb = openpyxl.load_workbook(ruta_salida)
+        ws = wb.active
+        fila_inicio = ws.max_row + 1
+    else:
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Equipos"
+        fila_inicio = 2
+
+        fill = PatternFill("solid", fgColor="2E75B6")
+        font_header = Font(bold=True, color="FFFFFF")
+
+        for col_idx, nombre in enumerate(encabezados, start=1):
+            celda = ws.cell(row=1, column=col_idx, value=nombre)
+            celda.fill = fill
+            celda.font = font_header
+            celda.alignment = Alignment(horizontal="center")
+
+    for fila_idx, registro in enumerate(registros, start=fila_inicio):
+        for col_idx, (col, _) in enumerate(CAMPOS, start=1):
+            ws.cell(row=fila_idx, column=col_idx, value=registro.get(col, ""))
+
+    for col in ws.columns:
+        max_len = max((len(str(c.value or "")) for c in col), default=10)
+        ws.column_dimensions[col[0].column_letter].width = min(max_len + 4, 40)
+
+    wb.save(ruta_salida)
+
+
+def main():
+    while True:
+        ruta_txt = input("Archivo .txt: ").strip()
+        if not ruta_txt:
+            continue
+        if not ruta_txt.lower().endswith(".txt"):
+            ruta_txt += ".txt"
+        if Path(ruta_txt).exists():
+            break
+
+    ruta_excel = input("Archivo Excel (Enter = equipos.xlsx): ").strip()
+    if not ruta_excel:
+        ruta_excel = "equipos.xlsx"
+    if not ruta_excel.lower().endswith(".xlsx"):
+        ruta_excel += ".xlsx"
+
+    registros = leer_bloques(ruta_txt)
+
+    if not registros:
+        input("\nPresiona Enter para salir...")
+        return
+
+    escribir_excel(registros, ruta_excel)
+    input("\nPresiona Enter para salir...")
+
+
+if __name__ == "__main__":
+    main()
