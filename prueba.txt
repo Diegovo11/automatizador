@@ -1,0 +1,49 @@
+NS:U66655M5N563274
+Pwd: WUf0gu7U
+Ubicación : juzgado 14
+Nombre área: actuaría 
+Nivel: piso 7
+Contraseña: ADMINOAJ
+Se remplaza ns:  95009719
+marca sharp modelo: MX-M5071
+IP: 10.70.9.27
+
+NS: U66655M5N563284
+Pwd: dHT5jU0h
+Ubicación : juzgado 14
+Nombre área: área común 
+Nivel: piso 7
+Contraseña: ADMINOAJ
+Se remplaza ns: 95013409
+marca sharp modelo: MX-M5071
+IP: 10.70.9.177
+
+NS: U66655L5N556946
+Pwd: KXd33w7
+Ubicación : juzgado 14
+Nombre área: actuaría 
+Nivel: piso 7
+Contraseña: ADMINOAJ
+Se remplaza ns: 95011769
+marca sharp modelo: MX-M5071
+IP:  10.70.9.108
+
+NS: U66655M5N563345
+Pwd: VGm5GnnQ
+Ubicación : juzgado 14
+Nombre área: área común 
+Nivel: piso 7
+Contraseña: ADMINOAJ
+Se remplaza ns: 9F103819
+marca sharp modelo: MX-B476W
+IP: 10.70.9.107
+
+NS: U66655M5N563313
+Pwd: gPr1G6GQ
+Ubicación : Juzgado 13
+Nombre área: mesa 2 y 7
+Nivel: Piso 7
+Contraseña: ADMINOAJ
+Se remplaza ns: 9F103929
+marca sharp modelo: MX-B476W
+IP: 10.70.9.31
